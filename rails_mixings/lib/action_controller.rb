@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
   end
 end
 
-if RAILS_GEM_VERSION >= '2.2.0' then
+if RAILS_GEM_VERSION >= '2.1.0' then
   module ActionController::Caching::Fragments
     def fragment_cache_key(key)
       # quitar views/ de las keys
