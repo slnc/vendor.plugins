@@ -120,7 +120,7 @@ class ActiveRecord::Errors
   def full_messages_html
     out = '<ul>'
     self.each do |attr, msg|
-      out = "#{out}<li><strong>#{Inflector::titleize(attr)}</strong> #{msg}</li>"
+      out = "#{out}<li><strong>#{ActiveSupport::Inflector::titleize(attr)}</strong> #{msg}</li>"
     end
     out = "#{out}</ul>"
   end
