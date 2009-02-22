@@ -36,7 +36,7 @@ module Delayed
         cur_version = ActiveRecord::Base.db_query("SELECT svn_revision FROM global_vars")[0]['svn_revision'].to_i
         
         if cur_version != my_version
-          say "my version: #{my_version} | cur_version: #{cur_version}"
+          say "my version (#{my_version}) differs from cur_version (#{cur_version}). Exiting.."
           break
         end
         
