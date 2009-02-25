@@ -36,6 +36,7 @@ class Notification
               'Delivery Status Notification (Failure)',
               'Delivery Notification: Delivery has failed',
               'failure notice',
+              'Undeliverable Message',
               'Message Delivery Failure',
               'Delivery status notification',
               'Delivery Status Notification']
