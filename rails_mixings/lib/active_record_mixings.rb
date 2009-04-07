@@ -126,8 +126,12 @@ class ActiveRecord::Errors
   end
 end
 
-module ActiveRecord::QueryCache
-  alias :cache :uncached
+if nil
+module ::ActiveRecord
+  class QueryCache
+    alias :cache :uncached
+  end
+end
 end
 
 class ActiveRecord::Migration

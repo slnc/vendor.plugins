@@ -1,3 +1,4 @@
+require 'test/unit'
 module Test::Unit::Assertions
   def overload_rake_for_tests
     load File.dirname(__FILE__) + '/overload_rake_for_tests.rb'
@@ -177,5 +178,4 @@ module Test::Unit::Assertions
       assert_equal(options[name], cookie.send(name), msg)
     end if options.key?(name)
   end
-  
 end
