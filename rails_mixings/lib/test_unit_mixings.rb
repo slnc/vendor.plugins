@@ -16,6 +16,20 @@ module Test::Unit::Assertions
     assert_equal false, File.exists?("#{FRAGMENT_CACHE_PATH}/#{f}.cache"), "#{f}.cache EXISTS and it SHOULD NOT"
   end
   
+    
+  # Busca en todos los emails uno que contenga el texto indicado
+  def assert_email_with_text(some_text)
+    found = false
+    ActionMailer::Base.deliveries.each do |eml|
+      if eml.body.index(some_text)
+        found = true
+        break
+      end
+    end
+    assert found
+  end
+  
+  
   def assert_count_increases(model, &block)
     m = :count
     begin
