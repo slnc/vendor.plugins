@@ -12,7 +12,8 @@ module StatsMixings
           :clickthrough => :clck, 
           :comments => :cmm, 
           :page_clickthrough => :pclck, 
-          :total_clickthrough => :tclck}  
+          :total_clickthrough => :tclck}
+          self.send(:after_init) if self.respond_to?(:after_init) 
       end
     end
     
