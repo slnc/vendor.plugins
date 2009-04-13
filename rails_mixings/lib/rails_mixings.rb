@@ -25,7 +25,7 @@ stats_mixings
 ).each do |f|
   require "#{File.dirname(__FILE__)}/#{f}.rb"
 end
-puts "after requires"
+
 # $:.unshift "#{File.dirname(__FILE__)}/lib"
 
 Notification.send :include, NotificationMixings
