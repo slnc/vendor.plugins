@@ -126,12 +126,14 @@ class ActiveRecord::Errors
   end
 end
 
-if nil
-module ::ActiveRecord
-  class QueryCache
-    alias :cache :uncached
+if RAILS_GEM_VERSION == '2.1.2'
+  module ::ActiveRecord
+    module QueryCache
+      alias :cache :uncached
+    end
   end
-end
+else
+  puts "WARNING: QueryCache is on!"
 end
 
 class ActiveRecord::Migration
