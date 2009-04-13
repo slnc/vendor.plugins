@@ -1,5 +1,3 @@
-puts 'UserMixings'
-
 module UserMixings
   def friendships_received_pending
     Friendship.find(:all, :conditions => ['receiver_user_id = ? and accepted_on is null', self.id])
