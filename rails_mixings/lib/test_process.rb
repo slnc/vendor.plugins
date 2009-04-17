@@ -120,7 +120,6 @@ module ActionController #:nodoc:
     end
  
     def recycle!
-      puts "recycle!"
       @env["action_controller.request.request_parameters"] = {}
       self.query_parameters = {}
       self.path_parameters = {}
