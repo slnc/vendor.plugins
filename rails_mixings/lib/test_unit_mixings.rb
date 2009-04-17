@@ -193,3 +193,16 @@ module Test::Unit::Assertions
     end if options.key?(name)
   end
 end
+
+if RAILS_GEM_VERSION >= "3.2.2"
+module TestRequestMixings
+    # Hasta que salga rails 2.3.3
+    def recycle!
+      @env["action_controller.request.request_parameters"] = {}
+      self.query_parameters = {}
+      self.path_parameters = {}
+      @headers, @request_method, @accepts, @content_type = nil, nil, nil, nil
+    end
+end
+ActionController::TestRequest.include TestRequestMixings
+end
