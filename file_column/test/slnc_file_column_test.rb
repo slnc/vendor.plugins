@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../../../../test/test_helper'
 
-class SlncFileColumnTest < Test::Unit::TestCase
+class SlncFileColumnTest < ActiveSupport::TestCase
   def setup
     # Creamos dummy arecord object
     #@ct = ContentsType.create({:name => 'ActsAsTaggableMockRecord'})
@@ -13,27 +13,27 @@ class SlncFileColumnTest < Test::Unit::TestCase
     FileUtils.rm_rf("#{RAILS_ROOT}/public/storage/slnc_file_column_mock_format_jpg")
   end
   
-  def test_should_save_record_if_file_empty_and_not_required
+  test "_should_save_record_if_file_empty_and_not_required" do
     mock = SlncFileColumnMockRecord.create({:name => 'foo'})
     assert_equal true, mock.save, mock.errors.to_yaml
     assert_nil mock.file
     assert_not_nil mock.destroy
   end
   
-  def test_should_save_record_if_file_not_empty_and_not_required
+  test "_should_save_record_if_file_not_empty_and_not_required" do
     @mock = SlncFileColumnMockRecord.create({:name => 'foo', :file => fixture_file_upload('files/image.jpg', 'image/jpeg')})
     assert_equal true, @mock.save, @mock.errors.to_yaml
     assert_equal 'storage/slnc_file_column_mock_records/0000/001_image.jpg', @mock.file
     assert_equal true, File.exists?("#{RAILS_ROOT}/public/#{@mock.file}")
   end
   
-  def test_should_delete_file_when_destroyed
+  test "_should_delete_file_when_destroyed" do
     test_should_save_record_if_file_not_empty_and_not_required
     assert_not_nil @mock.destroy
     assert_equal false, File.exists?("#{RAILS_ROOT}/public/#{@mock.file}")
   end
   
-  def test_should_delete_previous_file_when_updating
+  test "_should_delete_previous_file_when_updating" do
     mock = SlncFileColumnMockRecord.create({:name => 'foo', :file => fixture_file_upload('files/image.jpg', 'image/jpeg')})
     prev = mock.file
     assert_equal true, mock.update_attributes({:file => fixture_file_upload('files/buddha.jpg', 'image/jpeg')}), mock.errors.to_yaml
@@ -43,21 +43,21 @@ class SlncFileColumnTest < Test::Unit::TestCase
     mock.destroy
   end
   
-  def test_should_not_modify_file_record_if_updated_with_nothing
+  test "_should_not_modify_file_record_if_updated_with_nothing" do
     mock = SlncFileColumnMockRecord.create({:name => 'foo', :file => fixture_file_upload('files/image.jpg', 'image/jpeg')})
     mock.update_attributes({})
     assert_equal true, File.exists?("#{RAILS_ROOT}/public/#{mock.file}")
     assert_equal 'storage/slnc_file_column_mock_records/0000/001_image.jpg', mock.file
   end
   
-  def test_should_not_modify_file_record_if_updated_with_invalid_file
+  test "_should_not_modify_file_record_if_updated_with_invalid_file" do
     mock = SlncFileColumnMockRecord.create({:name => 'foo', :file => fixture_file_upload('files/image.jpg', 'image/jpeg')})
     mock.update_attributes({:file => 'wahariibii'})
     assert_equal true, File.exists?("#{RAILS_ROOT}/public/#{mock.file}")
     assert_equal 'storage/slnc_file_column_mock_records/0000/001_image.jpg', mock.file
   end
   
-  def test_should_set_to_nil_if_updated_with_nil
+  test "_should_set_to_nil_if_updated_with_nil" do
     mock = SlncFileColumnMockRecord.create({:name => 'foo', :file => fixture_file_upload('files/image.jpg', 'image/jpeg')})
     prev_file = mock.file
     mock.update_attributes({:file => nil})
@@ -65,7 +65,7 @@ class SlncFileColumnTest < Test::Unit::TestCase
     assert_nil mock.file
   end
   
-  def test_should_work_with_multiple_files
+  test "_should_work_with_multiple_files" do
     mock = SlncFileColumnMockMultipleRecord.create({:name => 'foo', :file1 => fixture_file_upload('files/image.jpg', 'image/jpeg'), :file2 => fixture_file_upload('files/buddha.jpg', 'image/jpeg')})
     assert_equal true, File.exists?("#{RAILS_ROOT}/public/#{mock.file1}")
     assert_equal true, File.exists?("#{RAILS_ROOT}/public/#{mock.file2}")
@@ -80,7 +80,7 @@ class SlncFileColumnTest < Test::Unit::TestCase
     assert_equal 'storage/slnc_file_column_mock_multiple_records/0000/001_buddha.jpg', mock.file2
   end
   
-  def test_should_work_with_multiple_files_and_same_name
+  test "_should_work_with_multiple_files_and_same_name" do
     mock = SlncFileColumnMockMultipleRecord.create({:name => 'foo', :file1 => fixture_file_upload('files/image.jpg', 'image/jpeg'), :file2 => fixture_file_upload('files/image.jpg', 'image/jpeg')})
     assert_equal true, File.exists?("#{RAILS_ROOT}/public/#{mock.file1}")
     assert_equal true, File.exists?("#{RAILS_ROOT}/public/#{mock.file2}")

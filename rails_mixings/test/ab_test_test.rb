@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../../../../test/test_helper'
 
 class AbTestTest < ActiveSupport::TestCase
   
-  def test_should_properly_assign_untreated_user
+  test "should_properly_assign_untreated_user" do
    (1..8).each do |treatments|
       r = Range.new(0, treatments)
       @t = AbTest.new({:name => "Foobar #{treatments}", :treatments => treatments, :min_difference => 0.05, :metrics => [:comments]}) # a/b test
@@ -13,13 +13,13 @@ class AbTestTest < ActiveSupport::TestCase
     end
   end
   
-  def test_should_properly_remember_treated_user
+  test "should_properly_remember_treated_user" do
     test_should_properly_assign_untreated_user
     User.db_query("INSERT INTO treated_visitors(visitor_id, ab_test_id, treatment) VALUES('a1', #{@t.id}, #{@new_treatment});")
     assert_equal [@new_treatment, false], @t.get_visitor_treatment_num('a1')
   end
   
-  def test_should_switch_treatment_to_previous_if_anon_user_becomes_logged_in
+  test "should_switch_treatment_to_previous_if_anon_user_becomes_logged_in" do
     test_should_properly_remember_treated_user
     User.db_query("UPDATE treated_visitors SET user_id = 1 WHERE visitor_id = 'a1';")
     User.db_query("INSERT INTO treated_visitors(visitor_id, ab_test_id, treatment) VALUES('a2', #{@t.id}, #{@new_treatment + 1});")

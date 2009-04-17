@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/../../../../test/test_helper'
 
-class SilencedEmailTest < Test::Unit::TestCase
+class SilencedEmailTest < ActiveSupport::TestCase
 
   # Replace this with your real tests.
-  def test_truth
+  test "truth" do
     assert true
   end
 end

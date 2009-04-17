@@ -96,16 +96,16 @@ module RubyMixings
     end 
   end
   
-  module DateTime
-    def to_time
-      d = new_offset(0)
-      d.instance_eval do
-        Time.utc(year, mon, mday, hour, min, sec,
-         (sec_fraction * 86400000000).to_i)
-      end
-      getlocal
-    end
-  end
+ # module DateTime
+ #   def to_time
+ #     d = new_offset(0)
+ #     d.instance_eval do
+ #       Time.utc(year, mon, mday, hour, min, sec,
+ #        (sec_fraction * 86400000000).to_i)
+ #     end
+ #     getlocal
+ #   end
+ # end
   
   module ObjectMixing
     # private
