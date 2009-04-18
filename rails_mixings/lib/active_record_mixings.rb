@@ -132,8 +132,6 @@ if RAILS_GEM_VERSION == '2.1.2'
       alias :cache :uncached
     end
   end
-else
-  puts "WARNING: QueryCache is on!"
 end
 
 class ActiveRecord::Migration
