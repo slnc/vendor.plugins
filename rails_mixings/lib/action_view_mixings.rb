@@ -261,12 +261,20 @@ module ActionViewMixings
   end
   
   def format_interval(time, resolution = 'mins', smallest = false)
+    orig_time = time
     # la resolución es de más grande a más pequeño, si se especifica dias, se
     # pintan años, meses y días
     # smallest significa que se escriba la resolución con el menor número posible de letras
     time = time.to_i
     res = ""
     units = {}
+    next_resolution = {'años' => 'meses', 
+		       'meses' => 'semanas', 
+		       'semanas' => 'días', 
+		       'días' => 'horas', 
+                       'horas' => 'mins', 
+                       'mins' => 'secs', 
+                       'secs' => nil}
     [ ["secs", 60], ["mins",   60], ["horas", 24], ["días", 7], ['semanas', 4], ["meses", 12], ["años",  1]].each do |name, unit|
       if name == resolution then
         res = '' # borramos lo calculado hasta ahora
@@ -279,6 +287,7 @@ module ActionViewMixings
       
       time /= unit
     end
+
     if smallest
       %w(años meses semanas días horas mins secs).each do |unit|
         if units[unit] == 0
@@ -288,10 +297,18 @@ module ActionViewMixings
         else
           unit_ext = unit
         end
-        return "#{units[unit]} #{unit_ext}" if res[unit]
+        
+        return "#{units[unit]} #{unit_ext}".strip if res[unit]
+      end
+      # si llegamos aquí es que la unidad pedida es muy grande para el tiempo que queda 
+      # (por ej si han pedido horas y quedan minutos), mostramos la siguiente
+      if resolution == 'secs'
+          return ''
+      else
+          format_interval(orig_time, next_resolution[resolution], smallest)
       end
     else
-      res  
+      res.strip
     end
     
   end
