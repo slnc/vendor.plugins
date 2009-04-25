@@ -25,7 +25,6 @@ class ExceptionNotifierHelperTest < Test::Unit::TestCase
     stub_controller(ControllerWithoutFilterParameters.new)
     assert @helper.filter_sensitive_post_data_from_env("RAW_POST_DATA", "secret").include?("secret")
   end
-
   def test_should_not_exclude_raw_post_parameters_if_controller_can_not_filter_parameters
     stub_controller(ControllerWithoutFilterParameters.new)
     assert !@helper.exclude_raw_post_parameters?    
@@ -54,4 +53,5 @@ class ExceptionNotifierHelperTest < Test::Unit::TestCase
     def stub_controller(controller)
       @helper.instance_variable_set(:@controller, controller)
     end
+<<<<<<< HEAD:exception_notification/test/exception_notifier_helper_test.rb
 end
