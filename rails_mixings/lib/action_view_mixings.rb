@@ -75,16 +75,16 @@ module ActionViewMixings
     elsif format == 'intelligent'
       d_now = Time.now.beginning_of_day
       if date >= d_now
-        date.strftime('%H:%M')
+        date.strftime_es('%H:%M')
       elsif date >= Time.local(d_now.year, 1, 1)
-        date.strftime('%d %b')
+        date.strftime_es('%d %b')
       else
-        date.strftime('%d/%m/%Y')
+        date.strftime_es('%d/%m/%Y')
       end
     elsif format == 'custom'
-      date.strftime(customformat)
+      date.strftime_es(customformat)
     elsif date != nil 
-      date.strftime(formats[format])
+      date.strftime_es(formats[format])
     else
         ''
     end
