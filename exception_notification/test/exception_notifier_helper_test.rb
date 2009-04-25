@@ -53,5 +53,4 @@ class ExceptionNotifierHelperTest < Test::Unit::TestCase
     def stub_controller(controller)
       @helper.instance_variable_set(:@controller, controller)
     end
-<<<<<<< HEAD:exception_notification/test/exception_notifier_helper_test.rb
 end
