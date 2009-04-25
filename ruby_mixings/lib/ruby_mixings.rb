@@ -1,5 +1,6 @@
 require 'iconv'
 require 'base64'
+Time
 
 module RubyMixings
 # if nil # ruby 1.8.7
@@ -15,6 +16,10 @@ module RubyMixings
         'Viernes', 'Sábado']
     
     GM_ABBR_DAYNAMES = ['D', 'L', 'M', 'X', 'J', 'V', 'S']
+    
+    def strftime_es(*args)
+      to_time.strftime_es(*args)
+    end
   end
 
   module FloatMixing
