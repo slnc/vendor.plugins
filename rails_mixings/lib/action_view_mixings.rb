@@ -52,10 +52,10 @@ module ActionViewMixings
         out<< "</div><script type=\"text/javascript\">slnc.marklinks('xab#{abtest.id}-#{treatment}', '_xca=xab#{abtest.id}-#{treatment}');</script>" if opts[:add_xab_to_links]
         out
       else
-        concat("<div id=\"xab#{abtest.id}-#{treatment}\">", block.binding) if opts[:add_xab_to_links]
-        concat("<input type=\"hidden\" name=\"_xca\" value=\"xab#{abtest.id}-#{treatment}\" />", block.binding) if opts[:form]
+        concat("<div id=\"xab#{abtest.id}-#{treatment}\">") if opts[:add_xab_to_links]
+        concat("<input type=\"hidden\" name=\"_xca\" value=\"xab#{abtest.id}-#{treatment}\" />") if opts[:form]
         yield
-        concat("</div><script type=\"text/javascript\">slnc.marklinks('xab#{abtest.id}-#{treatment}', '_xca=xab#{abtest.id}-#{treatment}');</script>", block.binding) if opts[:add_xab_to_links]        
+        concat("</div><script type=\"text/javascript\">slnc.marklinks('xab#{abtest.id}-#{treatment}', '_xca=xab#{abtest.id}-#{treatment}');</script>") if opts[:add_xab_to_links]        
       end
       # log it, why? podria ser una acción, un nuevo algoritmo, etc
       # bueno, entonces me preocuparé luego
