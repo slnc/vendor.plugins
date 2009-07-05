@@ -117,7 +117,6 @@ module SlncFileColumn
           File.unlink("#{RAILS_ROOT}/public/#{@old_files[f]}") if (@old_files[f].to_s != '' && File.exists?("#{RAILS_ROOT}/public/#{@old_files[f]}"))
           if @tmp_files[f].kind_of?(NilClass)
             self.class.db_query("UPDATE #{self.class.table_name} SET #{f} = NULL WHERE id = #{self.id}")
-            self.reload
           else
             dir = self.class.table_name << '/' << (id/1000).to_s.rjust(4, '0')
             new_path = save_uploaded_file_to(@tmp_files[f], dir, (id%1000).to_s.rjust(3, '0'))
@@ -126,13 +125,11 @@ module SlncFileColumn
               hash = file_hash("#{RAILS_ROOT}/public/#{new_path}")
               self.class.db_query("UPDATE #{self.class.table_name} SET #{hash_attrib} = '#{hash}' WHERE id = #{self.id}")
             end
-            self.reload
-            # self.attributes[f] = new_path
-            # raise "#{new_path} #{self.id}"
             @tmp_files.delete(f)
           end
         end
       end
+      self.reload # necesario para que el modelo tenga los nuevos atributos
     end
   end
 
