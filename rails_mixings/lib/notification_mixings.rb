@@ -16,8 +16,8 @@ module NotificationMixings
         break if i >= max
         if process_email_envelope(@imap.fetch(message_id, "ENVELOPE")[0].attr["ENVELOPE"])
           mark_for_deletion(message_id)
-        elsif process_email_body(@imap.fetch(message_id, "BODYSTRUCTURE")[0].attr["ENVELOPE"])
-          mark_for_deletion(message_id)
+        #elsif process_email_body(@imap.fetch(message_id, "BODYSTRUCTURE")[0].attr["ENVELOPE"])
+         # mark_for_deletion(message_id)
         else
           # puts "don't know what to do with email #{message_id} #{@imap.fetch(message_id, "ENVELOPE")[0].attr["ENVELOPE"].subject}"
           # move_unknown_email(message_id)
