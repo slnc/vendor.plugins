@@ -56,6 +56,12 @@ class Friendship < ActiveRecord::Base
     end
   end
   
+  def accept_external(receiver)
+    self.update_attributes(:receiver_email => nil,
+                           :receiver_user_id => receiver.id,
+                           :accepted_on => Time.now)
+  end
+  
   private
   def check_not_own_friend
     sender_user_id == receiver_user_id ? false : true
@@ -102,9 +108,5 @@ class Friendship < ActiveRecord::Base
     200
   end
   
-  def accept_external(receiver)
-    self.update_attributes(:receiver_email => nil,
-                           :receiver_user_id => receiver.id,
-                           :accepted_on => Time.now)
-  end
+  
 end
