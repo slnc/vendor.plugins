@@ -101,4 +101,10 @@ class Friendship < ActiveRecord::Base
   def self.max_unanswered
     200
   end
+  
+  def accept_external(receiver)
+    self.update_attributes(:receiver_email => nil,
+                           :receiver_user_id => receiver.id,
+                           :accepted_on => Time.now)
+  end
 end
