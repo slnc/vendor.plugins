@@ -45,10 +45,12 @@ module SlncFileColumn
   end
   
   def _fc_file_name(tmp_file, orig=false)
-    if tmp_file.respond_to?('original_filename') then
+    if tmp_file.respond_to?(:original_filename)
       orig ? tmp_file.original_filename : tmp_file.original_filename.bare
-    else
+    elsif tmp_file.respond_to?(:path)
       orig ? File.basename(tmp_file.path) : File.basename(tmp_file.path).bare # para archivos subidos en masa
+    else
+      nil
     end
   end
   
