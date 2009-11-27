@@ -11,7 +11,10 @@ ActionView::Base.send :include, ActionViewMixings
 require 'action_controller_mixings.rb'
 ActionController::Base.send :include, ActionControllerMixings
 
-if defined?(User)
+begin
+require 'user'
+rescue Exception
+else
 require 'user_mixings.rb'
 User.send :include, UserMixings
 
@@ -32,4 +35,5 @@ end
 Notification.send :include, NotificationMixings
 Stats::Goals.send :include, StatsMixings::GoalsMixings
 end
+
 # require 'test_unit_mixings'
