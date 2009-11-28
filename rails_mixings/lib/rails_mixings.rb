@@ -12,7 +12,7 @@ require 'action_controller_mixings.rb'
 ActionController::Base.send :include, ActionControllerMixings
 
 begin
-require 'user'
+User
 rescue Exception
 else
 require 'user_mixings.rb'
