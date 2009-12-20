@@ -71,35 +71,28 @@ module SlncFileColumn
           end
           if self.id
             if self.class.count(:conditions => ["id <> #{self.id} AND #{hash_attrib} = ?", new_hash]) > 0
-            self.errors.add(f.to_sym, 'El archivo especificado ya existe')
-            return false
-          end
+              self.errors.add(f.to_sym, 'El archivo especificado ya existe')
+              return false
+            end
           else
             if self.class.count(:conditions => ["#{hash_attrib} = ?", new_hash]) > 0
-            self.errors.add(f.to_sym, 'El archivo especificado ya existe')
-            return false
-          end
+              self.errors.add(f.to_sym, 'El archivo especificado ya existe')
+              return false
+            end
           end
           
         end
         
         # check format
-        # check size
+        # check size (TODO)
         if self.class._fc_options[f.to_sym][:format]
           filename = _fc_file_name(@tmp_files[f])
           case self.class._fc_options[f.to_sym][:format]
             when :jpg then
             if !(/\.jpg$/i =~ filename)
-              # intentamos convertir a jpg si es imagen y error otherwise
-              if Cms::IMAGE_FORMAT =~ filename
-                # convertir imagen
-                # Cms::read_image(filename).write(filename.gsub(Cms::IMAGE_FORMAT, 'jpg'))
-                # @tmp_files[f] = File.open(filename.gsub(Cms::IMAGE_FORMAT, 'jpg'))
-              else
-                self.errors.add(f.to_sym, "El archivo #{_fc_file_name(tmp_file, true)} no es una imagen (Formatos válidos: JPG, PNG y GIF)")
-                return false
-              end
-            end
+              self.errors.add(f.to_sym, "El archivo #{_fc_file_name(tmp_file, true)} no es una imagen (Formato válido: JPG)")
+              return false
+            end           
           end
         end
       end
