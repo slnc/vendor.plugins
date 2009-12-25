@@ -164,11 +164,8 @@ module ActionViewMixings
       params2['controller'] = "/#{params2[:controller]}"
       params2['controller'].gsub!('//', '/')
     end
-    #params2.delete('_xab')
-    #params2.delete('_xad[]')
-    #params2.delete('_xab_new_treated_visitors')
-    #raise params2.keys.join(',')
-    # invalidk = %w(_xab _xad _xab_new_treated_visitors)
+    
+    
     validk = %w(action params controller page id category)
     validk = validk + (options[:preserve_keys].kind_of?(Array) ? options[:preserve_keys] : [options[:preserve_keys]]) if options[:preserve_keys] 
     params2.delete_if { |k,v| !validk.include?(k.to_s)}   

@@ -10,6 +10,8 @@ module ActionControllerMixings
     base.class_eval do
       before_filter :init_xab
       include ActionControllerMixings::InstanceMethods
+      attr_accessor :_xad
+      attr_accessor :smodel_id
     end
   end
     
@@ -19,10 +21,11 @@ module ActionControllerMixings
       params['_xab'] = ActiveSupport::JSON.decode(CGI::unescape(params['_xab'])) if params['_xab'].kind_of?(String)
       params['_xab_new_treated_visitors'] = {}
       
-      params['_xad'] = [] unless params['_xad']
-      params['_xad'] = ActiveSupport::JSON.decode(CGI::unescape(params['_xad'])) if params['_xad'].kind_of?(String)
+      self._xad = [] unless self._xad
+      self._xad = params[:_xad] if params[:_xad]
+      self._xad = ActiveSupport::JSON.decode(CGI::unescape(self._xad)) if self._xad.kind_of?(String)
       
-      params[:smodel_id] = params[:id] if !params[:smodel_id] && params[:id]
+      self.smodel_id = params[:id] if self.smodel_id.nil? && params[:id]
     end
   end
 end
