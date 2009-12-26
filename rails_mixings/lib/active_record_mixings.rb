@@ -145,3 +145,20 @@ class ActiveRecord::Migration
     end    
   end
 end
+
+ActiveRecord::Base.class_eval do
+  def self.paginate_in_reverse(options = {})
+    unless options[:page]
+      # we only default to the last page if no explicit page has been given
+      total_entries = self.count(:conditions => options[:conditions])
+      # calculate the last page
+      per_page = options[:per_page] ? options[:per_page] : self.per_page
+      total_pages = (total_entries / per_page.to_f).ceil
+      # update the options hash to hold this information
+      options = options.merge(:page => total_pages, :total_entries => total_entries)
+    end
+    
+    # do the usual stuff
+    self.paginate(options)
+  end
+end
