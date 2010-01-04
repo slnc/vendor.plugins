@@ -123,7 +123,7 @@ module ActionViewMixings
     
   def ip_country_flag(ipaddr)
     ip_info = Geolocation.ip_info(ipaddr)
-     (ip_info[2] != '') ? "<img class=\"icon\" title=\"#{ip_info[4]}\" alt=\"#{ip_info[4]}\" src=\"http://#{App.domain}/images/flags/#{ip_info[2].downcase}.gif\" />" : ''
+     (ip_info && ip_info[2] != '') ? "<img class=\"icon\" title=\"#{ip_info[4]}\" alt=\"#{ip_info[4]}\" src=\"http://#{App.domain}/images/flags/#{ip_info[2].downcase}.gif\" />" : ''
   end
   
   
