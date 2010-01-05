@@ -1,6 +1,6 @@
-puts 'deadlock_retry'
+#puts 'deadlock_retry'
 #begin
-  require 'active_record'
+#  require 'active_record'
 #rescue LoadError
 #  if ENV['ACTIVERECORD_PATH'].nil?
 #    abort <<MSG
@@ -15,7 +15,7 @@ puts 'deadlock_retry'
 #      abort "ActiveRecord could not be found."
 #    end
 #  end
-##end
+#end
 
 require 'test/unit'
 #require "#{File.dirname(__FILE__)}/../lib/deadlock_retry"
