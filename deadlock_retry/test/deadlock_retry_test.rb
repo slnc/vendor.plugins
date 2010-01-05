@@ -1,23 +1,24 @@
-begin
+puts 'deadlock_retry'
+#begin
   require 'active_record'
-rescue LoadError
-  if ENV['ACTIVERECORD_PATH'].nil?
-    abort <<MSG
-Please set the ACTIVERECORD_PATH environment variable to the directory
-containing the active_record.rb file.
-MSG
-  else
-    $LOAD_PATH.unshift << ENV['ACTIVERECORD_PATH']
-    begin
-      require 'active_record'
-    rescue LoadError
-      abort "ActiveRecord could not be found."
-    end
-  end
-end
+#rescue LoadError
+#  if ENV['ACTIVERECORD_PATH'].nil?
+#    abort <<MSG
+#Please set the ACTIVERECORD_PATH environment variable to the directory
+#containing the active_record.rb file.
+#MSG
+#  else
+#    $LOAD_PATH.unshift << ENV['ACTIVERECORD_PATH']
+#    begin
+#      require 'active_record'
+#    rescue LoadError
+#      abort "ActiveRecord could not be found."
+#    end
+#  end
+##end
 
 require 'test/unit'
-require "#{File.dirname(__FILE__)}/../lib/deadlock_retry"
+#require "#{File.dirname(__FILE__)}/../lib/deadlock_retry"
 
 class MockModel
   def self.transaction(*objects, &block)

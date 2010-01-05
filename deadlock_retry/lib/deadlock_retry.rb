@@ -55,3 +55,8 @@ module DeadlockRetry
     end
   end
 end
+
+if defined?(Rails) and defined?(ActiveRecord) and defined?(ActionController) and !ActiveRecord::Base.respond_to?(:transaction_without_deadlock_handling)
+  ActiveRecord::Base.send :include, DeadlockRetry
+end
+
