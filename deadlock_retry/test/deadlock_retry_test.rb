@@ -18,7 +18,7 @@
 #end
 
 require 'test/unit'
-#require "#{File.dirname(__FILE__)}/../lib/deadlock_retry"
+require "#{File.dirname(__FILE__)}/../lib/deadlock_retry"
 
 class MockModel
   def self.transaction(*objects, &block)
