@@ -13,5 +13,4 @@ class GeolocationTest < ActiveSupport::TestCase
   test "resolve_ad_mode_should_properly_return_sa_for_ve_ip" do
     assert_equal 'sa', Geolocation.resolve_ad_mode('150.188.229.4')
   end
-
 end
