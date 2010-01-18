@@ -81,6 +81,9 @@ class GoogleChart
     params.each_pair do |key, value|
       chart_params << "#{key}=#{value}"
     end
+    chart_params << "chds=#{@data.min},#{@data.max}"
+    chart_params << "chxt=y"
+    #chart_params << "chxr=1,#{@data.min},#{@data.max},#{(@data.max - @data.min)/100}"
     "#{SERVER}#{(chart_params * '&amp;')}"
   end
   def to_s
