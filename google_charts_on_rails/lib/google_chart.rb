@@ -55,6 +55,7 @@ class GoogleChart
   attr_accessor :colors
   attr_accessor :title
   attr_accessor :labels
+  attr_accessor :xlabels
   attr_accessor :data
   attr_accessor :height
   attr_accessor :width
@@ -82,7 +83,17 @@ class GoogleChart
       chart_params << "#{key}=#{value}"
     end
     chart_params << "chds=#{@data.min},#{@data.max}"
-    chart_params << "chxt=y"
+    chart_params << "chxr=1,#{@data.min},#{@data.max}"
+    chart_params << "chxt=x,y"
+    chart_params << "chxl=0:|#{@xlabels.join('|')}"
+    interval_size = (100 / (@xlabels.size-1)).floor
+    
+    chxp = @xlabels.size.times.collect do |t|
+      t*interval_size
+    end
+    chxp[chxp.size-1] = 100
+    chart_params << "chxp=0,#{chxp.join(',')}"
+    
     #chart_params << "chxr=1,#{@data.min},#{@data.max},#{(@data.max - @data.min)/100}"
     "#{SERVER}#{(chart_params * '&amp;')}"
   end
