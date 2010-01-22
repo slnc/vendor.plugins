@@ -6,7 +6,7 @@ class Friendship < ActiveRecord::Base
   
   
   before_create :check_max_unanswered
-  before_save :create_external_invitation_key
+  before_create :create_external_invitation_key
   before_save :check_either_receiver_user_id_or_email_is_set
   before_save :check_not_own_friend
   
@@ -100,7 +100,7 @@ class Friendship < ActiveRecord::Base
   end
   
   def create_external_invitation_key
-    self.external_invitation_key = Digest::MD5.hexdigest((Kernel.rand(1000000).to_i + self.id.to_i + Time.now.to_i).to_s) if self.receiver_email
+    self.external_invitation_key = Digest::MD5.hexdigest((Kernel.rand(1000000).to_i + self.sender_user_id + Time.now.to_i).to_s)
     true
   end
   

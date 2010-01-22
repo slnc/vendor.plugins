@@ -53,6 +53,12 @@ if Friendship.table_exists?
       assert_not_nil f.external_invitation_key
     end
     
+    test "create_friendship_with_existing_user_should_create_external_invitation_key" do
+      f = Friendship.new({:sender_user_id => 1, :receiver_user_id => 3 })
+      assert f.save
+      assert_not_nil f.external_invitation_key
+    end
+    
     test "should_only_accept_valid_emails" do
       # TODO
     end
