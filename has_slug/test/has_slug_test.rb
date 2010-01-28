@@ -41,7 +41,7 @@ class HasSlugTest < ActiveSupport::TestCase
     c = HasSlugTestRecord.new
     c.name = '¿El Oso Madroño.guaperás del mund!>·")%("'
     c.save
-    assert_equal 'el-oso-madronoguaperas-del-mund_2', c.slug
+    assert_equal 'el-oso-madronoguaperas-del-mund-2', c.slug
   end
 
   def teardown
