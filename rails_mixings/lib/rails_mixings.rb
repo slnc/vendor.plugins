@@ -12,12 +12,12 @@ require 'action_controller_mixings.rb'
 ActionController::Base.send :include, ActionControllerMixings
 
 begin
-User
+  User
 rescue Exception
 else
-require 'user_mixings.rb'
-User.send :include, UserMixings
-
+  require 'user_mixings.rb'
+  User.send :include, UserMixings
+  
 %w(
 ab_test  
 action_mailer
@@ -27,13 +27,24 @@ notification_mixings
 silenced_email
 stats_mixings  
 ).each do |f|
-  require "#{File.dirname(__FILE__)}/#{f}.rb"
+    require "#{File.dirname(__FILE__)}/#{f}.rb"
+  end
+  
+  # $:.unshift "#{File.dirname(__FILE__)}/lib"
 end
 
-# $:.unshift "#{File.dirname(__FILE__)}/lib"
+begin
+  Notification
+rescue Exception
+else
+  Notification.send :include, NotificationMixings
+end
 
-Notification.send :include, NotificationMixings
-Stats::Goals.send :include, StatsMixings::GoalsMixings
+begin 
+  Stats
+rescue Exception
+else
+    Stats::Goals.send :include, StatsMixings::GoalsMixings
 end
 
 # require 'test_unit_mixings'
