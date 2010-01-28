@@ -39,3 +39,5 @@ module HasSlug
     end
   end
 end
+
+ActiveRecord::Base.send :include, HasSlug 

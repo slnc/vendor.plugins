@@ -210,8 +210,6 @@ class Array
     return d0+d1
     
     # el_id = (n.size * percentile)
-    
-    
   end
   
   def chunk(number_of_chunks)
