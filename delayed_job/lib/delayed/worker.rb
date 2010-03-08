@@ -4,10 +4,10 @@ module Delayed
 
     cattr_accessor :logger
     self.logger = if defined?(Merb::Logger)
-                    Merb.logger
-                  elsif defined?(RAILS_DEFAULT_LOGGER)
-                    RAILS_DEFAULT_LOGGER
-                  end
+      Merb.logger
+    elsif defined?(RAILS_DEFAULT_LOGGER)
+      RAILS_DEFAULT_LOGGER
+    end
 
     def initialize(options={})
       @quiet = options[:quiet]
@@ -17,29 +17,11 @@ module Delayed
 
     def start
       say "*** Starting job worker #{Delayed::Job.worker_name}"
-      
+
       trap('TERM') { say 'Exiting...'; $exit = true }
       trap('INT')  { say 'Exiting...'; $exit = true }
 
-      # save my pid so people can kill me
-      pid_file = "#{RAILS_ROOT}/tmp/pids/delayed_worker.#{Process.pid}.pid"
-      File.mkdir(File.dirname(pid_file)) unless File.exists?(File.dirname(pid_file))
-      f = File.open(pid_file, 'w')
-      f.write(Process.pid.to_s)
-      f.close
-      
-      # grab current application version
-      my_version = ActiveRecord::Base.db_query("SELECT svn_revision FROM global_vars")[0]['svn_revision'].to_i
-
       loop do
-        # if operating svn_version has changed let's commit suicide
-        cur_version = ActiveRecord::Base.db_query("SELECT svn_revision FROM global_vars")[0]['svn_revision'].to_i
-        
-        if cur_version != my_version
-          say "my version (#{my_version}) differs from cur_version (#{cur_version}). Exiting.."
-          break
-        end
-        
         result = nil
 
         realtime = Benchmark.realtime do
