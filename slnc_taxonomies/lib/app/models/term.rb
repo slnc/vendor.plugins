@@ -28,7 +28,7 @@ class Term < ActiveRecord::Base
   
   def check_taxonomy
     if !self.class.taxonomies.include?(self.taxonomy)
-      self.errors.add('term', "Taxonomía '#{self.taxonomy}' incorrecta. Taxonomías válidas: #{self.taxonomies.join(', ')}")
+      self.errors.add('term', "Taxonomía '#{self.taxonomy}' incorrecta. Taxonomías válidas: #{self.class.taxonomies.join(', ')}")
       false
     else
       true
