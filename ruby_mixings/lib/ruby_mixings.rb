@@ -123,6 +123,28 @@ module RubyMixings
     def standard_deviation(population)
       Math.sqrt(variance(population))
     end 
+    
+    def pearson(x, y)
+      n=x.length 
+      
+      sumx=x.inject(0) {|r,i| r + i}
+      sumy=y.inject(0) {|r,i| r + i}
+      
+      sumxSq=x.inject(0) {|r,i| r + i**2}
+      sumySq=y.inject(0) {|r,i| r + i**2}
+      
+      prods=[]; x.each_with_index{|this_x,i| prods << this_x*y[i]}
+      pSum=prods.inject(0){|r,i| r + i}
+      
+      # Calculate Pearson score 
+      num=pSum-(sumx*sumy/n) 
+      den=((sumxSq-(sumx**2)/n)*(sumySq-(sumy**2)/n))**0.5 
+      if den==0
+        return 0 
+      end
+      r=num/den 
+      return r       
+    end
   end
   
   # module DateTime
@@ -228,6 +250,55 @@ class Array
   # alias / chunk
 end
 
+class Integer
+  # calculates binomial coefficient of self choose k
+  # not recommended for large numbers as binomial coefficients get large quickly... e.g. 100 choose 50 is 100891344545564193334812497256
+  def choose(k)
+    return 0 if (k > self)
+    n = self
+    r = 1
+    1.upto(k) do |d|
+      r *= n
+      r /= d
+      n -= 1
+    end
+    return r
+  end
+end
+
+
+class Array
+  # when called without a block, returns an array with each combination.
+  # when called with a block, yields each combination to the block.
+  def each_choose(k, &block)
+    raise ArgumentError, "The combination size (#{k}) must be <= the array size (#{size}).", caller if k > size
+    raise ArgumentError, "The combination size (#{k}) cannot be negative.", caller if k < 0
+    
+    if block == nil
+      results = []
+      size.choose(k).times { |i| results << choose_index(k, i) }
+      return results
+    end
+    
+    size.choose(k).times { |i| yield choose_index(k, i) }
+  end
+
+  # returns the combination at index i of self.each_choose(k)
+  def choose_index(n, i)
+    results = []
+    size.times do |x|
+      break if n == 0
+      threshold = (size - x - 1).choose(n - 1)
+      if i < threshold
+        results << self[x]
+        n -= 1
+      else
+        i = i - threshold
+      end
+    end
+    return results
+  end
+end
 
 
 

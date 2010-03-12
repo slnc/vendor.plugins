@@ -11,6 +11,7 @@ require 'spec'
 ActiveRecord::Base.logger = Logger.new('/tmp/dj.log')
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => '/tmp/jobs.sqlite')
 ActiveRecord::Migration.verbose = false
+ActiveRecord::Base.default_timezone = :utc if Time.zone.nil?
 
 ActiveRecord::Schema.define do
 
@@ -35,5 +36,8 @@ end
 
 # Purely useful for test cases...
 class Story < ActiveRecord::Base
-  def tell; text; end
+  def tell; text; end       
+  def whatever(n, _); tell*n; end
+  
+  handle_asynchronously :whatever
 end
