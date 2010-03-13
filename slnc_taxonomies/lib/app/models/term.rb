@@ -26,6 +26,10 @@ class Term < ActiveRecord::Base
     VALID_TAXONOMIES
   end
   
+  def to_param
+    self.slug
+  end
+  
   def check_taxonomy
     if !self.class.taxonomies.include?(self.taxonomy)
       self.errors.add('term', "Taxonomía '#{self.taxonomy}' incorrecta. Taxonomías válidas: #{self.class.taxonomies.join(', ')}")
