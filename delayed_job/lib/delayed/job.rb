@@ -3,8 +3,6 @@ module Delayed
   class DeserializationError < StandardError
   end
 
-  # A job object that is persisted to the database.
-  # Contains the work object as a YAML field.
   class Job < ActiveRecord::Base
     MAX_ATTEMPTS = 25
     MAX_RUN_TIME = 4.hours
@@ -31,7 +29,9 @@ module Delayed
     self.min_priority = nil
     self.max_priority = nil
 
-    # When a worker is exiting, make sure we don't have any locked jobs.
+    class LockError < StandardError
+    end
+
     def self.clear_locks!
       update_all("locked_by = null, locked_at = null", ["locked_by = ?", worker_name])
     end
@@ -60,8 +60,6 @@ module Delayed
       self['handler'] = object.to_yaml
     end
 
-    # Reschedule the job in the future (when a job fails).
-    # Uses an exponential scale depending on the number of failed attempts.
     def reschedule(message, backtrace = [], time = nil)
       if self.attempts < MAX_ATTEMPTS
         time ||= Job.db_time_now + (attempts ** 4) + 5
@@ -73,36 +71,10 @@ module Delayed
         save!
       else
         logger.info "* [JOB] PERMANENTLY removing #{self.name} because of #{attempts} consequetive failures."
-        destroy_failed_jobs ? destroy : update_attribute(:failed_at, Delayed::Job.db_time_now)
+        destroy_failed_jobs ? destroy : update_attribute(:failed_at, Time.now)
       end
     end
 
-
-    # Try to run one job. Returns true/false (work done/work failed) or nil if job can't be locked.
-    def run_with_lock(max_run_time, worker_name)
-      logger.info "* [JOB] aquiring lock on #{name}"
-      unless lock_exclusively!(max_run_time, worker_name)
-        # We did not get the lock, some other worker process must have
-        logger.warn "* [JOB] failed to aquire exclusive lock for #{name}"
-        return nil # no work done
-      end
-
-      begin
-        runtime =  Benchmark.realtime do
-          invoke_job # TODO: raise error if takes longer than max_run_time
-          destroy
-        end
-        # TODO: warn if runtime > max_run_time ?
-        logger.info "* [JOB] #{name} completed after %.4f" % runtime
-        return true  # did work
-      rescue Exception => e
-        reschedule e.message, e.backtrace
-        log_exception(e)
-        return false  # work failed
-      end
-    end
-
-    # Add a job to the queue
     def self.enqueue(*args, &block)
       object = block_given? ? EvaledJob.new(&block) : args.shift
 
@@ -116,8 +88,6 @@ module Delayed
       Job.create(:payload_object => object, :priority => priority.to_i, :run_at => run_at)
     end
 
-    # Find a few candidate jobs to run (in case some immediately get locked by others).
-    # Return in random order prevent everyone trying to do same head job at once.
     def self.find_available(limit = 5, max_run_time = MAX_RUN_TIME)
 
       time_now = db_time_now
@@ -145,22 +115,38 @@ module Delayed
       records.sort_by { rand() }
     end
 
-    # Run the next job we can get an exclusive lock on.
+    # Get the payload of the next job we can get an exclusive lock on.
     # If no jobs are left we return nil
-    def self.reserve_and_run_one_job(max_run_time = MAX_RUN_TIME)
+    def self.reserve(max_run_time = MAX_RUN_TIME, &block)
 
-      # We get up to 5 jobs from the db. In case we cannot get exclusive access to a job we try the next.
+      # We get up to 5 jobs from the db. In face we cannot get exclusive access to a job we try the next.
       # this leads to a more even distribution of jobs across the worker processes
       find_available(5, max_run_time).each do |job|
-        t = job.run_with_lock(max_run_time, worker_name)
-        return t unless t == nil  # return if we did work (good or bad)
+        begin
+          logger.info "* [JOB] aquiring lock on #{job.name}"
+          job.lock_exclusively!(max_run_time, worker_name)
+          runtime =  Benchmark.realtime do
+            invoke_job(job.payload_object, &block)
+            job.destroy
+          end
+          logger.info "* [JOB] #{job.name} completed after %.4f" % runtime
+
+          return job
+        rescue LockError
+          # We did not get the lock, some other worker process must have
+          logger.warn "* [JOB] failed to aquire exclusive lock for #{job.name}"
+        rescue StandardError => e
+          job.reschedule e.message, e.backtrace
+          log_exception(job, e)
+          return job
+        end
       end
 
-      nil # we didn't do any work, all 5 were not lockable
+      nil
     end
 
-    # Lock this job for this worker.
-    # Returns true if we have the lock, false otherwise.
+    # This method is used internally by reserve method to ensure exclusive access
+    # to the given job. It will rise a LockError if it cannot get this lock.
     def lock_exclusively!(max_run_time, worker = worker_name)
       now = self.class.db_time_now
       affected_rows = if locked_by != worker
@@ -171,50 +157,46 @@ module Delayed
         # Simply resume and update the locked_at
         self.class.update_all(["locked_at = ?", now], ["id = ? and locked_by = ?", id, worker])
       end
-      if affected_rows == 1
-        self.locked_at    = now
-        self.locked_by    = worker
-        return true
-      else
-        return false
-      end
+      raise LockError.new("Attempted to aquire exclusive lock failed") unless affected_rows == 1
+
+      self.locked_at    = now
+      self.locked_by    = worker
     end
 
-    # Unlock this job (note: not saved to DB)
     def unlock
       self.locked_at    = nil
       self.locked_by    = nil
     end
 
     # This is a good hook if you need to report job processing errors in additional or different ways
-    def log_exception(error)
-      logger.error "* [JOB] #{name} failed with #{error.class.name}: #{error.message} - #{attempts} failed attempts"
+    def self.log_exception(job, error)
+      logger.error "* [JOB] #{job.name} failed with #{error.class.name}: #{error.message} - #{job.attempts} failed attempts"
       logger.error(error)
     end
 
-    # Do num jobs and return stats on success/failure.
-    # Exit early if interrupted.
     def self.work_off(num = 100)
       success, failure = 0, 0
 
       num.times do
-        case self.reserve_and_run_one_job
-        when true
+        job = self.reserve do |j|
+          begin
+            j.perform
             success += 1
-        when false
+          rescue
             failure += 1
-        else
-          break  # leave if no work could be done
+            raise
+          end
         end
-        break if $exit # leave if we're exiting
+
+        break if job.nil?
       end
 
       return [success, failure]
     end
 
     # Moved into its own method so that new_relic can trace it.
-    def invoke_job
-      payload_object.perform
+    def self.invoke_job(job, &block)
+      block.call(job)
     end
 
   private
@@ -245,11 +227,8 @@ module Delayed
        klass.constantize
     end
 
-    # Get the current time (GMT or local depending on DB)
-    # Note: This does not ping the DB to get the time, so all your clients
-    # must have syncronized clocks.
     def self.db_time_now
-      (ActiveRecord::Base.default_timezone == :utc) ? Time.now.utc : Time.zone.now
+      (ActiveRecord::Base.default_timezone == :utc) ? Time.now.utc : Time.now
     end
 
   protected
