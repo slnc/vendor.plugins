@@ -30,6 +30,17 @@ class Term < ActiveRecord::Base
     self.slug
   end
   
+  def news_sources
+    case self.taxonomy
+      when 'District':
+      # majority
+      NewsSource.find(:all, :conditions => ['id IN (?)', TQDistrictOfNewsSource.find(:all, :conditions => ['_dons_term_id = ?', self.id]).collect { |tqdons| tqdons._dons_news_source_id }], :order => 'lower(name)')
+    else
+      raise 'Unimplemented'
+    end
+    
+  end
+  
   def check_taxonomy
     if !self.class.taxonomies.include?(self.taxonomy)
       self.errors.add('term', "Taxonomía '#{self.taxonomy}' incorrecta. Taxonomías válidas: #{self.class.taxonomies.join(', ')}")
