@@ -1,6 +1,6 @@
 class Term < ActiveRecord::Base
   named_scope :top_level, :conditions => 'id = root_id AND parent_id IS NULL'
-  named_scope :in_taxonomy, lambda { |taxonomy| {:conditions => "taxonomy = '#{taxonomy}'"}}
+  named_scope :in_type, lambda { |type| { :conditions => "type = '#{type}'"}}
   
   acts_as_rootable
   acts_as_tree :order => 'name'
@@ -14,13 +14,13 @@ class Term < ActiveRecord::Base
   # VALIDATES siempre los últimos
   validates_format_of :slug, :with => /^[a-z0-9_.-]{0,50}$/
   validates_format_of :name, :with => /^.{1,100}$/
-  validates_presence_of :taxonomy
+  validates_presence_of :type
   plain_text :name, :description
-  validates_uniqueness_of :name, :scope => [:taxonomy, :parent_id]
-  validates_uniqueness_of :slug, :scope => [:taxonomy, :parent_id]
+  validates_uniqueness_of :name, :scope => [:type, :parent_id]
+  validates_uniqueness_of :slug, :scope => [:type, :parent_id]
   before_save :check_scope_if_toplevel
   
-  before_save :check_taxonomy
+  before_save :check_type
   
   def self.taxonomies
     VALID_TAXONOMIES
@@ -30,20 +30,9 @@ class Term < ActiveRecord::Base
     self.slug
   end
   
-  def news_sources
-    case self.taxonomy
-      when 'District':
-      # majority
-      NewsSource.find(:all, :conditions => ['id IN (?)', TQDistrictOfNewsSource.find(:all, :conditions => ['_dons_term_id = ?', self.id]).collect { |tqdons| tqdons._dons_news_source_id }], :order => 'lower(name)')
-    else
-      raise 'Unimplemented'
-    end
-    
-  end
-  
-  def check_taxonomy
-    if !self.class.taxonomies.include?(self.taxonomy)
-      self.errors.add('term', "Taxonomía '#{self.taxonomy}' incorrecta. Taxonomías válidas: #{self.class.taxonomies.join(', ')}")
+  def check_type
+    if !self.class.taxonomies.include?(self.type)
+      self.errors.add('term', "Taxonomía '#{self.type}' incorrecta. Taxonomías válidas: #{self.class.taxonomies.join(', ')}")
       false
     else
       true
@@ -75,7 +64,7 @@ class Term < ActiveRecord::Base
     
     par = self.parent
     
-    self.taxonomy = par.taxonomy if par.taxonomy
+    self.type = par.type if par.type
     true
   end
   
@@ -88,14 +77,14 @@ class Term < ActiveRecord::Base
     true
   end 
   
-  def self.find_taxonomy(id, taxonomy)
-    sql_tax = taxonomy.nil? ? 'IS NULL' : "= #{User.connection.quote(taxonomy)}"
-    Term.find(:first, :conditions => ["id = ? AND taxonomy #{sql_tax}", id])
+  def self.find_type(id, type)
+    sql_tax = type.nil? ? 'IS NULL' : "= #{User.connection.quote(type)}"
+    Term.find(:first, :conditions => ["id = ? AND type #{sql_tax}", id])
   end
   
-  def self.find_taxonomy_by_code(code, taxonomy)
+  def self.find_type_by_code(code, type)
     # Solo para taxonomías toplevel
-    Term.find(:first, :conditions => ['id = root_id AND code = ? AND taxonomy = ?', code, taxonomy])
+    Term.find(:first, :conditions => ['id = root_id AND code = ? AND type = ?', code, type])
   end
   
   
@@ -104,7 +93,7 @@ class Term < ActiveRecord::Base
     cats = [self.id]
     conds = []
     conds << opts[:cond] if opts[:cond].to_s != ''
-    conds << "taxonomy = #{User.connection.quote(opts[:taxonomy])}" if opts[:taxonomy]
+    conds << "type = #{User.connection.quote(opts[:type])}" if opts[:type]
     
     cond = ''
     cond = " AND #{conds.join(' AND ')}" if conds.size > 0
@@ -122,7 +111,7 @@ class Term < ActiveRecord::Base
     cats.uniq
   end
   
-  def self.taxonomy_from_class_name(cls_name)
+  def self.type_from_class_name(cls_name)
     "#{ActiveSupport::Inflector::pluralize(cls_name)}Category"
   end
   

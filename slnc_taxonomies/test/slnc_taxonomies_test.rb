@@ -4,7 +4,7 @@ class SlncTaxonomiesTest < ActiveSupport::TestCase
   
   def setup
       Term.class_eval do
-        def self.taxonomies
+        def self.types
           ['District']
         end
       end
@@ -15,7 +15,7 @@ class SlncTaxonomiesTest < ActiveSupport::TestCase
   end
   
   test "should be able to create term" do
-    t = Term.new(:name => 'foo', :taxonomy => 'District')
+    t = District.new(:name => 'foo')
     assert t.save, t.errors.full_messages_html
   end
 end
