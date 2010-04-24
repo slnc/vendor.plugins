@@ -316,7 +316,7 @@ class Time
   def slnc_print(format='default', customformat=nil)
     formats = {'default' => '%d %b %Y, %H:%M',
                'time' => '%H:%M',
-               'self' => '%d %b %Y',
+               'date' => '%d %b %Y',
                'custom' => '',
                'compact' => '%d/%m/%Y, %H:%M' }
     
