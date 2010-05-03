@@ -323,6 +323,8 @@ class Time
     
     if format == 'unix'
       self.to_i
+    elsif format == 'full'
+      "<span class=\"tstamp\">#{self.iso8601}</span>"
     elsif format == 'intelligent'
       d_now = Time.now.beginning_of_day
       if self >= d_now
