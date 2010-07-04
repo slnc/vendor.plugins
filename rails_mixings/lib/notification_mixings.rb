@@ -64,7 +64,7 @@ module NotificationMixings
           end
           true
         else
-          puts "not deleting message because envelope host is #{envelope.to[0].host}"
+          # puts "not deleting message because envelope host is #{envelope.to[0].host}"
           false
         end
       else
