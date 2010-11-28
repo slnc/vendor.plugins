@@ -93,21 +93,7 @@ module ActionViewMixings
   DEF_ALLOW_TAGS = ['a','img','p','br','i','b','u','ul','li', 'em', 'strong']
   
   def strip_tags_allowed(html, allow=DEF_ALLOW_TAGS)
-    if html && html.index("<")
-      text = ""
-      tokenizer = HTML::Tokenizer.new(html)
-      
-      while token = tokenizer.next
-        node = HTML::Node.parse(nil, 0, 0, token, false)
-        # result is only the content of any Text nodes
-        text << node.to_s if (node.class == HTML::Text or (node.class == HTML::Tag and allow.include?(node.name)))
-      end
-      # strip any comments, and if they have a newline at the end (ie. line with
-      # only a comment) strip that too
-      text.gsub(/<!--(.*?)-->[\n]?/m, "") 
-    else
-      html # already plain text
-    end 
+    ActionView::Base.new.sanitize(html, :tags => allow, :attributes => %w(href title alt title))
   end
   
   def oddclass
@@ -215,6 +201,7 @@ module ActionViewMixings
       tidy.options.char_encoding = 'utf8'
       xml = tidy.clean(text)
     end
+    xml
   end
   
   def tohtmlattribute(str)
