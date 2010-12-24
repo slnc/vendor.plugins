@@ -93,7 +93,7 @@ module ActionViewMixings
   DEF_ALLOW_TAGS = ['a','img','p','br','i','b','u','ul','li', 'em', 'strong']
   
   def strip_tags_allowed(html, allow=DEF_ALLOW_TAGS)
-    ActionView::Base.new.sanitize(html, :tags => allow, :attributes => %w(href title alt title))
+    ActionView::Base.new.sanitize(html, :tags => allow, :attributes => %w(href title alt title name value width height src wmode type))
   end
   
   def oddclass

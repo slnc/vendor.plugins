@@ -110,8 +110,15 @@ module Test::Unit::Assertions
     end
   end
   
+  def uncompress_feedvalidator2(zipfile, dst_dir)
+    FileUtils.mkdir_p(dst_dir)
+    system ("tar xfz #{zipfile} -C #{dst_dir}")
+  end
+  
   def assert_valid_feed2(content=@response.body)
     validate = "#{RAILS_ROOT}/script/feedvalidator2/demo.py"
+    bname = File.dirname(validate)
+    self.uncompress_feedvalidator2("#{bname}.tar.gz", "#{bname}/..") unless File.exists?(validate)
     path = Pathname.new("#{RAILS_ROOT}/tmp")
     Tempfile.open('feed', path.cleanpath) do |tmpfile|
       tmpfile.write(content)
