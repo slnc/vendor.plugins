@@ -12,7 +12,7 @@ class ActionViewMixingsTest < ActiveSupport::TestCase
   
   test "clean html should remove harmful attributes" do
     str = 'foo <a href="mailto:dharana@dharana.net" onclick="alert(\'foo\');">dharana@dharana.net</a>'
-    assert_equal 'foo', ActionViewTestContainer.new.clean_html(str).strip
+    assert_equal 'foo <a href="mailto:dharana@dharana.net">dharana@dharana.net</a>', ActionViewTestContainer.new.clean_html(str).strip
   end
   
   #test "print_interval" do
