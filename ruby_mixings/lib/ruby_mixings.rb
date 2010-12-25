@@ -206,7 +206,7 @@ class Array
       inject(0) { |sum, x| sum + x }
     rescue
       p self
-      raise "fuck"
+      raise "it didn't work"
     end
     # return 0
   end
