@@ -101,11 +101,11 @@ module StatsMixings
         # contabilizamos impresiones y conversiones
         count_sql = opts[:total] ? 'count(visitor_id)' :  'count(distinct(visitor_id))'
         
-        out[:impressions] = Dbs.db_query("SELECT #{count_sql}
+        out[:impressions] = User.db_query("SELECT #{count_sql}
                                           FROM stats.pageviews as parent
                                          WHERE #{from_where_sql}")[0]['count'].to_f
         
-        out[:conversions] = Dbs.db_query("SELECT #{count_sql}
+        out[:conversions] = User.db_query("SELECT #{count_sql}
                                           FROM stats.pageviews as parent
                                          WHERE #{to_where_sql}")[0]['count'].to_f                                         
         
@@ -119,7 +119,7 @@ module StatsMixings
         # calculo la media de páginas servidas a cada visitante durante el tiempo que duró el experimento
         out = {}
         out[:treated_visitors] = self.treated_visitors(opts)
-        dbinfo = Dbs.db_query("SELECT avg(foo), stddev(foo) FROM (select count(*) as foo
+        dbinfo = User.db_query("SELECT avg(foo), stddev(foo) FROM (select count(*) as foo
                                     FROM stats.pageviews as parent
                                    WHERE #{date_constraints(opts)}
                                      #{visitor_id_constraint(opts)}
@@ -135,7 +135,7 @@ module StatsMixings
         # visitantes tratados
         # los visitantes para los que hay tratamiento configurado Y que se han pasado por la página
         # con dicho tratamiento
-        Dbs.db_query("SELECT count(distinct(visitor_id))
+        User.db_query("SELECT count(distinct(visitor_id))
                       FROM treated_visitors
                      WHERE ab_test_id = #{opts[:ab_test_treatment][0].id}
                        AND treatment = #{opts[:ab_test_treatment][1]}

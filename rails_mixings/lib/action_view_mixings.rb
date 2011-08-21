@@ -93,21 +93,7 @@ module ActionViewMixings
   DEF_ALLOW_TAGS = ['a','img','p','br','i','b','u','ul','li', 'em', 'strong']
   
   def strip_tags_allowed(html, allow=DEF_ALLOW_TAGS)
-    if html && html.index("<")
-      text = ""
-      tokenizer = HTML::Tokenizer.new(html)
-      
-      while token = tokenizer.next
-        node = HTML::Node.parse(nil, 0, 0, token, false)
-        # result is only the content of any Text nodes
-        text << node.to_s if (node.class == HTML::Text or (node.class == HTML::Tag and allow.include?(node.name)))
-      end
-      # strip any comments, and if they have a newline at the end (ie. line with
-      # only a comment) strip that too
-      text.gsub(/<!--(.*?)-->[\n]?/m, "") 
-    else
-      html # already plain text
-    end 
+    ActionView::Base.new.sanitize(html, :tags => allow, :attributes => %w(href title alt title name value width height src wmode type))
   end
   
   def oddclass
@@ -120,7 +106,7 @@ module ActionViewMixings
     @odd = 1
   end
   
-    
+  
   def ip_country_flag(ipaddr)
     ip_info = Geolocation.ip_info(ipaddr)
      (ip_info && ip_info[2].to_s != '') ? "<img class=\"icon\" title=\"#{ip_info[4]}\" alt=\"#{ip_info[4]}\" src=\"http://#{App.domain}/images/flags/#{ip_info[2].downcase}.gif\" />" : ''
@@ -199,7 +185,6 @@ module ActionViewMixings
   def clean_html(text, tags=['a','img','p','br','i','b','u','ul','li', 'em', 'strong', 'span', 'table', 'tr', 'td'])
     text = strip_tags_allowed(text, tags)
     Tidy.path = defined?(App.tidy_path) ? App.tidy_path : '/usr/lib/libtidy.so'
-    
     xml = Tidy.open do |tidy|
       tidy.options.bare = 1
       tidy.options.doctype = 'omit'
@@ -213,8 +198,9 @@ module ActionViewMixings
       tidy.options.quote_marks = 1
       tidy.options.show_body_only = 1
       tidy.options.char_encoding = 'utf8'
-      xml = tidy.clean(text)
+      tidy.clean(text)
     end
+    xml
   end
   
   def tohtmlattribute(str)
@@ -284,7 +270,7 @@ module ActionViewMixings
       
       time /= unit
     end
-
+    
     if smallest
       %w(años meses semanas días horas mins secs).each do |unit|
         if units[unit] == 0
@@ -300,9 +286,9 @@ module ActionViewMixings
       # si llegamos aquí es que la unidad pedida es muy grande para el tiempo que queda 
       # (por ej si han pedido horas y quedan minutos), mostramos la siguiente
       if resolution == 'secs'
-          return ''
+        return ''
       else
-          format_interval(orig_time, next_resolution[resolution], smallest)
+        format_interval(orig_time, next_resolution[resolution], smallest)
       end
     else
       res.strip
