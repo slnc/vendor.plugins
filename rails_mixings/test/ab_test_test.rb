@@ -131,7 +131,6 @@ if AbTest.table_exists?
       end
       insert_sql = "#{fields.keys.join(', ')}"
       values_sql = "#{fields.values.collect {|c| User.connection.quote(c.to_s) }.join(', ')}"
-      puts "INSERT INTO stats.pageviews(ip, #{insert_sql}) VALUES('127.0.0.1', #{values_sql})"
       User.db_query("INSERT INTO stats.pageviews(ip, #{insert_sql}) VALUES('127.0.0.1', #{values_sql})")
     end
   end
